@@ -1,0 +1,39 @@
+name: pos_app
+description: "All in One POS — offline-first point of sale (Android first, Grocery pilot)."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  # State management (available in the local pub cache — offline resolution).
+  provider: 6.1.5+1
+  # App documents directory for the SQLite file (pub cache).
+  path_provider: 2.1.6
+  path: 1.9.1
+  # UUID v4 primary keys per Foundation design §1.1 (pub cache).
+  uuid: 4.5.3
+  intl: 0.20.3
+  # Data layer: raw SQLite via FFI. sqflite/drift need codegen / extra setup,
+  # so these two were downloaded from pub.dev and vendored INTO this repo
+  # under vendor/ (relative paths — they resolve identically on a local
+  # machine and on cloud build runners such as GitHub Actions / Codemagic).
+  # sqlite3_flutter_libs supplies the native libsqlite3 for Android at build
+  # time (its Gradle dep eu.simonbinder:sqlite3-native-library comes from
+  # Maven Central on the first Gradle run).
+  sqlite3:
+    path: vendor/sqlite3
+  sqlite3_flutter_libs:
+    path: vendor/sqlite3_flutter_libs
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: 6.0.0
+
+flutter:
+  uses-material-design: true
