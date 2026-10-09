@@ -217,7 +217,7 @@ class _CartBar extends StatelessWidget {
                   onPressed: state.cart.isEmpty ? null : onCheckout,
                   icon: const Icon(Icons.payments),
                   label: Text(
-                      '${state.t('checkout')} (${state.cartCount} ${state.t('items')})'),
+                      '${state.t('checkout')} (${_fmtQty(state.cartQtyTotal)} ${state.t('items')})'),
                 ),
               ],
             ),

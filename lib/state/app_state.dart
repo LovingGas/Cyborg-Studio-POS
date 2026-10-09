@@ -149,7 +149,10 @@ class AppState extends ChangeNotifier {
 
   // ---- cart ----
   int get cartTotal => cart.fold(0, (s, i) => s + i.lineTotal);
-  int get cartCount => cart.length;
+
+  /// Total quantity in the cart (sum of line quantities) — the checkout
+  /// button's "N items" means pieces, not distinct product lines.
+  double get cartQtyTotal => cart.fold(0.0, (s, i) => s + i.qty);
 
   void addToCart(Product p) {
     final existing = cart.where((i) => i.product.id == p.id);
