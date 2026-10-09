@@ -129,7 +129,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               dense: true,
               contentPadding: EdgeInsets.zero,
               title: Text(paymentMethodLabel(b.method)),
-              subtitle: Text('${state.t('sales_count')}: ${b.count}'),
+              subtitle: Text(
+                  '${state.t('sales_count')}: ${b.count} · ${_fmtQty(b.items)} ${state.t('items')}'),
               trailing: Text(ks(b.total),
                   style: const TextStyle(fontWeight: FontWeight.bold)),
             ),

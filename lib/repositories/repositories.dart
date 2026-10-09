@@ -361,8 +361,10 @@ class SaleRepository {
     return salesSummary(fromMs: start, toMs: start + 86400000);
   }
 
-  /// (method code, count, total) for completed sales in the window.
-  List<({String method, int count, int total})> paymentBreakdown({
+  /// (method code, sale count, total, item quantity) for completed sales
+  /// in the window. Item quantities come from a separate grouped query so
+  /// the join cannot inflate the money totals.
+  List<({String method, int count, int total, double items})> paymentBreakdown({
     required int fromMs,
     required int toMs,
   }) {
@@ -373,11 +375,25 @@ class SaleRepository {
       'GROUP BY payment_method ORDER BY t DESC',
       [fromMs, toMs],
     );
+    final itemRows = _db.select(
+      'SELECT s.payment_method AS m, COALESCE(SUM(si.qty), 0) AS iq '
+      'FROM sales s JOIN sale_items si ON si.sale_id = s.id '
+      'WHERE s.status = \'completed\' AND s.deleted_at IS NULL '
+      'AND si.deleted_at IS NULL '
+      'AND s.created_at >= ? AND s.created_at < ? '
+      'GROUP BY s.payment_method',
+      [fromMs, toMs],
+    );
+    final itemsByMethod = <String, double>{
+      for (final r in itemRows)
+        r['m'] as String: (r['iq'] as num).toDouble(),
+    };
     return rows
         .map((r) => (
               method: r['m'] as String,
               count: (r['c'] as num).toInt(),
               total: (r['t'] as num).toInt(),
+              items: itemsByMethod[r['m'] as String] ?? 0,
             ))
         .toList();
   }

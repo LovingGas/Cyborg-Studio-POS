@@ -147,9 +147,9 @@ void main() {
   test('dashboard aggregates ignore voided sales', () {
     final p = seedProduct();
     final keep = sales.completeSale(
-      items: [CartItem(p, 1)],
+      items: [CartItem(p, 3)],
       paymentMethod: 'cash',
-      amountPaid: 1500,
+      amountPaid: 4500,
     );
     final drop = sales.completeSale(
       items: [CartItem(p, 1)],
@@ -166,5 +166,7 @@ void main() {
     );
     expect(breakdown.length, 1);
     expect(breakdown.single.method, 'cash');
+    expect(breakdown.single.count, 1); // one transaction…
+    expect(breakdown.single.items, 3); // …of three pieces
   });
 }
