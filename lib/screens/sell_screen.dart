@@ -400,12 +400,18 @@ class _CheckoutDialogState extends State<CheckoutDialog> {
     // (only shown when no customers exist yet) completes the sale without a
     // customer link — the People screen is a later step.
     final customerId = _customerId;
+    // Paid amount: a typed Cash amount wins; anything else (wallets, card,
+    // bank — and Cash with the field left blank) counts as paid in full, so
+    // a receipt never shows "Paid: 0 Ks" for a settled sale.
+    final typedPaid = int.tryParse(_paidCtrl.text.replaceAll(',', '')) ?? 0;
+    final amountPaid =
+        _method == 'cash' && typedPaid > 0 ? typedPaid : state.cartTotal;
     final sale = state.sales.completeSale(
       items: List.of(state.cart),
       paymentMethod: _method,
       paymentBank: _method == 'bank_transfer' ? _bank : null,
       customerId: customerId,
-      amountPaid: int.tryParse(_paidCtrl.text.replaceAll(',', '')) ?? 0,
+      amountPaid: amountPaid,
     );
     state.clearCart();
     Navigator.pop(context, true);

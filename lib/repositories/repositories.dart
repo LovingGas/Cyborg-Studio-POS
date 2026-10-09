@@ -202,7 +202,9 @@ class SaleRepository {
     final costTotal = items.fold<int>(
         0, (s, i) => s + (i.product.costPrice * i.qty).round());
     final total = subtotal;
-    final paid = paymentMethod == 'cash' ? amountPaid : total;
+    // A recorded sale is settled: non-Cash always counts as paid in full,
+    // and Cash with no amount entered (0) means "exact" — never store 0.
+    final paid = paymentMethod == 'cash' && amountPaid > 0 ? amountPaid : total;
     final change = paymentMethod == 'cash' && paid > total ? paid - total : 0;
     final saleId = newId();
     final receiptNo = _nextReceiptNo(t);
@@ -254,7 +256,7 @@ class SaleRepository {
   /// Newest first, voided sales included (shown struck-through in the UI).
   List<SaleRecord> listSales({int limit = 200}) {
     final rows = _db.select(
-      'SELECT s.*, (SELECT COUNT(*) FROM sale_items si WHERE si.sale_id = s.id) '
+      'SELECT s.*, (SELECT COALESCE(SUM(si.qty), 0) FROM sale_items si WHERE si.sale_id = s.id) '
       'AS item_count FROM sales s WHERE s.deleted_at IS NULL '
       'ORDER BY s.created_at DESC LIMIT ?',
       [limit],
@@ -264,7 +266,7 @@ class SaleRepository {
 
   SaleRecord? saleById(String saleId) {
     final rows = _db.select(
-      'SELECT s.*, (SELECT COUNT(*) FROM sale_items si WHERE si.sale_id = s.id) '
+      'SELECT s.*, (SELECT COALESCE(SUM(si.qty), 0) FROM sale_items si WHERE si.sale_id = s.id) '
       'AS item_count FROM sales s WHERE s.id = ?',
       [saleId],
     );

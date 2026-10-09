@@ -134,7 +134,10 @@ class SaleRecord {
   final int changeDue;
   final String status; // 'completed' | 'void'
   final int createdAt; // ms since epoch
-  final int itemCount;
+
+  /// Total quantity sold across all lines (SUM of qty), not the number of
+  /// distinct lines — "3 items" for 3 × the same product.
+  final double itemCount;
 
   const SaleRecord({
     required this.id,
@@ -177,7 +180,7 @@ class SaleRecord {
         changeDue: (r['change_due'] as num?)?.toInt() ?? 0,
         status: (r['status'] as String?) ?? 'completed',
         createdAt: (r['created_at'] as num?)?.toInt() ?? 0,
-        itemCount: (r['item_count'] as num?)?.toInt() ?? 0,
+        itemCount: (r['item_count'] as num?)?.toDouble() ?? 0,
       );
 }
 

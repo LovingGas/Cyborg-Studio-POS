@@ -7,6 +7,9 @@ import '../main.dart';
 import '../models/models.dart';
 import '../state/app_state.dart';
 
+String _fmtQty(double q) =>
+    q == q.roundToDouble() ? q.toInt().toString() : q.toString();
+
 class SalesHistoryScreen extends StatefulWidget {
   const SalesHistoryScreen({super.key});
 
@@ -52,7 +55,7 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                   ),
                   subtitle: Text(
                     '${timeFmt.format(when)} · ${s.paymentLabel} · '
-                    '${s.itemCount} ${state.t('items')}',
+                    '${_fmtQty(s.itemCount)} ${state.t('items')}',
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -162,10 +165,15 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
               border: Border.all(color: Colors.grey.shade400),
               borderRadius: BorderRadius.circular(4),
             ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
+            // Scale the whole fixed-width receipt down to fit the card so
+            // no line is ever clipped at either edge (a horizontal scroll
+            // view hid the left/right ends at large system font sizes).
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.topLeft,
               child: Text(
                 text,
+                softWrap: false,
                 style: TextStyle(
                   fontFamily: 'monospace',
                   fontSize: _widthChars == kPaper58Chars ? 12.5 : 11.5,
