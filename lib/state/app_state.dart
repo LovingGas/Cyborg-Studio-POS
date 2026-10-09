@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../core/receipt_text.dart';
+import '../core/themes.dart';
 import '../db/app_database.dart';
 import '../l10n/strings.dart';
 import '../models/models.dart';
@@ -21,6 +22,9 @@ class AppState extends ChangeNotifier {
   String? error;
 
   String lang = 'en';
+
+  /// Selected colour theme key (settings_kv `app_theme`, see kAppThemes).
+  String themeKey = kDefaultThemeKey;
   String shopName = 'My Shop';
   String? shopNameMm;
   String? shopPhone;
@@ -45,6 +49,7 @@ class AppState extends ChangeNotifier {
       customers = CustomerRepository(_holder, identity);
       purchases = PurchaseRepository(_holder, identity);
       lang = settings.get(identity.shopId, 'ui_lang') ?? 'en';
+      themeKey = settings.get(identity.shopId, 'app_theme') ?? kDefaultThemeKey;
       shopName = settings.get(identity.shopId, 'shop_name') ?? 'My Shop';
       shopNameMm = settings.get(identity.shopId, 'shop_name_mm');
       shopPhone = settings.get(identity.shopId, 'shop_phone');
@@ -81,6 +86,16 @@ class AppState extends ChangeNotifier {
     paperWidthChars = chars;
     settings.set(
         identity.shopId, 'printer_paper_width', chars == kPaper58Chars ? '58' : '80');
+    notifyListeners();
+  }
+
+  void setTheme(String key) {
+    themeKey = key;
+    settings.set(identity.shopId, 'app_theme', key);
+    _holder.db.execute(
+      'UPDATE shops SET theme = ?, updated_at = ? WHERE id = ?',
+      [key, nowMs(), identity.shopId],
+    );
     notifyListeners();
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../core/receipt_text.dart';
+import '../core/themes.dart';
 import '../state/app_state.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -135,6 +136,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
           selected: {state.lang},
           onSelectionChanged: (s) => state.setLang(s.first),
+        ),
+        const Divider(height: 32),
+        Text(state.t('theme_colour'),
+            style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            for (final option in kAppThemes)
+              ChoiceChip(
+                label: Text(option.label(state.lang)),
+                avatar: CircleAvatar(
+                    backgroundColor: option.seed,
+                    radius: 9),
+                selected: state.themeKey == option.key,
+                onSelected: (_) => state.setTheme(option.key),
+              ),
+          ],
         ),
         const Divider(height: 32),
         Text(state.t('license'),

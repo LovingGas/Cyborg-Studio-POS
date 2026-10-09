@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 
+import 'core/themes.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/more_screen.dart';
 import 'screens/products_screen.dart';
@@ -33,11 +34,13 @@ class PosApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<AppState>();
     return MaterialApp(
       title: 'Cyborg Studio POS',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+        colorScheme:
+            ColorScheme.fromSeed(seedColor: themeSeedColor(state.themeKey)),
         useMaterial3: true,
       ),
       home: const Shell(),
