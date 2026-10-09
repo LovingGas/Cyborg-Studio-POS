@@ -1,8 +1,8 @@
 name: Build APK
 
-# Builds the debug APK in the cloud (this project's local VM cannot run
-# Gradle). The finished APK appears under the run's Artifacts as
-# "all-in-one-pos-debug-apk" — see CLOUD_BUILD.md.
+# Builds release APKs in the cloud (this project's local VM cannot run
+# Gradle). The finished APKs appear under the run's Artifacts as
+# "cyborg-studio-pos-apks" — see CLOUD_BUILD.md.
 on:
   workflow_dispatch:
   push:
@@ -11,7 +11,7 @@ on:
 
 jobs:
   build-apk:
-    name: Analyze, test and build debug APK
+    name: Analyze, test and build release APKs
     runs-on: ubuntu-latest
 
     steps:
@@ -42,12 +42,15 @@ jobs:
       - name: Run tests
         run: flutter test
 
-      - name: Build debug APK
-        run: flutter build apk --debug
+      # Release + split-per-abi keeps each APK small (the universal debug
+      # APK was ~151 MB and failed to download/install on the phone).
+      # Most phones need app-arm64-v8a-release.apk.
+      - name: Build release APKs (split per ABI)
+        run: flutter build apk --release --split-per-abi
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: all-in-one-pos-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          name: cyborg-studio-pos-apks
+          path: build/app/outputs/flutter-apk/*.apk
           if-no-files-found: error
