@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../core/constants.dart';
 import '../main.dart';
 import '../state/app_state.dart';
+import 'products_screen.dart';
 
 class SellScreen extends StatefulWidget {
   const SellScreen({super.key});
@@ -39,7 +40,9 @@ class _SellScreenState extends State<SellScreen> {
         ),
         Expanded(
           child: items.isEmpty
-              ? Center(child: Text(state.t('no_products')))
+              ? (state.productList.isEmpty
+                  ? const ProductsEmptyState()
+                  : Center(child: Text(state.t('no_products'))))
               : GridView.builder(
                   padding: const EdgeInsets.all(12),
                   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(

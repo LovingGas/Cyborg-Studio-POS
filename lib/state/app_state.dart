@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../core/receipt_text.dart';
+import '../core/samples.dart';
 import '../core/themes.dart';
 import '../db/app_database.dart';
 import '../l10n/strings.dart';
@@ -128,6 +129,18 @@ class AppState extends ChangeNotifier {
   }
 
   // ---- products ----
+  /// Loads the Grocery sample catalog into an empty catalog. Returns how
+  /// many products were inserted (0 when the catalog is not empty).
+  int loadSampleProducts() {
+    if (products.list().isNotEmpty) return 0;
+    final samples = grocerySampleProducts();
+    for (final sample in samples) {
+      products.save(sample);
+    }
+    reloadProducts();
+    return samples.length;
+  }
+
   void reloadProducts() {
     productList = products.list();
     notifyListeners();

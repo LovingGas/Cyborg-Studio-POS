@@ -38,7 +38,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           ),
           Expanded(
             child: items.isEmpty
-                ? Center(child: Text(state.t('no_products')))
+                ? const ProductsEmptyState()
                 : ListView.separated(
                     itemCount: items.length,
                     separatorBuilder: (_, _) => const Divider(height: 1),
@@ -84,6 +84,60 @@ class _ProductsScreenState extends State<ProductsScreen> {
     if (saved == true && context.mounted) {
       context.read<AppState>().reloadProducts();
     }
+  }
+}
+
+/// Shown when the catalog is empty (Sell and Products): add the first
+/// product by hand, or load the Grocery sample catalog in one tap.
+class ProductsEmptyState extends StatelessWidget {
+  const ProductsEmptyState({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<AppState>();
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.inventory_2_outlined,
+                size: 56, color: Theme.of(context).disabledColor),
+            const SizedBox(height: 12),
+            Text(state.t('no_products'),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: () async {
+                final saved = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => const ProductFormDialog(),
+                );
+                if (saved == true && context.mounted) {
+                  context.read<AppState>().reloadProducts();
+                }
+              },
+              icon: const Icon(Icons.add),
+              label: Text(state.t('add_product')),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              onPressed: () {
+                final added = state.loadSampleProducts();
+                if (added > 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(state.t('samples_loaded'))),
+                  );
+                }
+              },
+              icon: const Icon(Icons.download_outlined),
+              label: Text(state.t('load_samples')),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -277,7 +331,11 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
 
   void _save(BuildContext context) {
     final state = context.read<AppState>();
-    if (_nameEn.text.trim().isEmpty) {
+    // A name in ONE language is enough: whichever field was filled becomes
+    // the primary name; the other stays optional.
+    final en = _nameEn.text.trim();
+    final mm = _nameMm.text.trim();
+    if (en.isEmpty && mm.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(state.t('required_field'))),
       );
@@ -290,8 +348,8 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
     final product = Product(
       id: widget.product?.id ?? newId(),
       categoryCode: _category,
-      nameEn: _nameEn.text.trim(),
-      nameMm: _nameMm.text.trim().isEmpty ? null : _nameMm.text.trim(),
+      nameEn: en.isNotEmpty ? en : mm,
+      nameMm: mm.isEmpty ? null : mm,
       sku: _sku.text.trim().isEmpty ? null : _sku.text.trim(),
       barcode: _barcode.text.trim().isEmpty ? null : _barcode.text.trim(),
       unit: _unit,
