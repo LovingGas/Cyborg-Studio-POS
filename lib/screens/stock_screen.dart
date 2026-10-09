@@ -67,9 +67,9 @@ class StockScreen extends StatelessWidget {
                       ),
                       subtitle: Text(
                         [
-                          if (status != null) status,
+                          ?status,
                           '${state.t('low_stock_at')}: ${_fmtQty(p.lowStockThreshold)}',
-                          if (note != null) note,
+                          ?note,
                         ].join(' · '),
                         style: TextStyle(
                           color: p.isOutOfStock
