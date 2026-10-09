@@ -46,31 +46,43 @@ class StockScreen extends StatelessWidget {
                   itemBuilder: (context, i) {
                     final p = items[i];
                     final note = expiryNote(p);
+                    // Status lives in the subtitle, not in a wide chip in
+                    // the trailing row: a long Myanmar chip label squeezed
+                    // the title into a one-character-wide vertical strip.
+                    final status = p.isOutOfStock
+                        ? state.t('out_of_stock')
+                        : p.isLowStock
+                            ? state.t('low_stock')
+                            : null;
                     return ListTile(
                       tileColor: p.isOutOfStock
                           ? Colors.red.withValues(alpha: 0.06)
                           : p.isLowStock
                               ? Colors.orange.withValues(alpha: 0.08)
                               : null,
-                      title: Text(p.displayName(state.lang)),
+                      title: Text(
+                        p.displayName(state.lang),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                       subtitle: Text(
-                        '${state.t('low_stock_at')}: ${_fmtQty(p.lowStockThreshold)}'
-                        '${note != null ? ' · $note' : ''}',
+                        [
+                          if (status != null) status,
+                          '${state.t('low_stock_at')}: ${_fmtQty(p.lowStockThreshold)}',
+                          if (note != null) note,
+                        ].join(' · '),
+                        style: TextStyle(
+                          color: p.isOutOfStock
+                              ? Colors.red.shade700
+                              : p.isLowStock
+                                  ? Colors.orange.shade800
+                                  : null,
+                          fontWeight: status != null ? FontWeight.w600 : null,
+                        ),
                       ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (p.isLowStock || p.isOutOfStock)
-                            Chip(
-                              label: Text(p.isOutOfStock
-                                  ? state.t('out_of_stock')
-                                  : state.t('low_stock')),
-                              backgroundColor: p.isOutOfStock
-                                  ? Colors.red.shade100
-                                  : Colors.orange.shade100,
-                              visualDensity: VisualDensity.compact,
-                            ),
-                          const SizedBox(width: 8),
                           Text(
                             '${_fmtQty(p.stockQty)} ${p.unit}',
                             style: const TextStyle(
