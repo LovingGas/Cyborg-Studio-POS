@@ -11,6 +11,8 @@ import 'package:intl/intl.dart';
 /// `receipt_footer_text` (receipt-customization addendum).
 const String kDefaultReceiptFooter = 'ကျေးဇူးတင်ပါသည် — နောက်ထပ် အားပေးပါဦး';
 
+const int kPaper40Chars = 24;
+const int kPaper48Chars = 28;
 const int kPaper58Chars = 32;
 const int kPaper80Chars = 48;
 

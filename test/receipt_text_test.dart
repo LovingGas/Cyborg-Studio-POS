@@ -31,6 +31,22 @@ void main() {
     }
   });
 
+  test('40mm receipt: no line exceeds 24 chars', () {
+    final lines = build(kPaper40Chars).split('\n');
+    for (final line in lines) {
+      expect(line.runes.length, lessThanOrEqualTo(kPaper40Chars),
+          reason: 'line too wide: "$line"');
+    }
+  });
+
+  test('48mm receipt: no line exceeds 28 chars', () {
+    final lines = build(kPaper48Chars).split('\n');
+    for (final line in lines) {
+      expect(line.runes.length, lessThanOrEqualTo(kPaper48Chars),
+          reason: 'line too wide: "$line"');
+    }
+  });
+
   test('80mm receipt: no line exceeds 48 chars', () {
     final lines = build(kPaper80Chars).split('\n');
     for (final line in lines) {

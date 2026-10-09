@@ -106,6 +106,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const Spacer(),
             SegmentedButton<int>(
               segments: const [
+                ButtonSegment(value: kPaper40Chars, label: Text('40mm')),
+                ButtonSegment(value: kPaper48Chars, label: Text('48mm')),
                 ButtonSegment(value: kPaper58Chars, label: Text('58mm')),
                 ButtonSegment(value: kPaper80Chars, label: Text('80mm')),
               ],
