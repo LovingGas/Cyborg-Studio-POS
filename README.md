@@ -1,17 +1,9 @@
-# pos_app
+# Cyborg Studio POS
 
-A new Flutter project.
+All-in-one point of sale app for shops in Myanmar — bilingual (English / မြန်မာ), offline-first, built with Flutter.
 
-## Getting Started
+- Android phone/tablet first; Windows follows on the same codebase
+- SQLite on-device database, cloud sync planned
+- 21 shop categories, 10 payment methods (Cash, KBZ Pay, AYA Pay, Wave Pay, CB Pay, UAB Pay, MMQR Pay, Bank Transfer, Card, Credit)
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+See `CLOUD_BUILD.md` for how the APK is built in the cloud via GitHub Actions.
