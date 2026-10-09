@@ -72,10 +72,11 @@ class AppState extends ChangeNotifier {
 
   String t(String key) => kStrings[lang]?[key] ?? kStrings['en']?[key] ?? key;
 
+  /// The Myanmar shop name wins whenever one is set — it is the shop's
+  /// signboard name, so the header and receipts show it in both UI
+  /// languages. Shops that only set an English name are unaffected.
   String get displayShopName =>
-      (lang == 'mm' && shopNameMm != null && shopNameMm!.isNotEmpty)
-          ? shopNameMm!
-          : shopName;
+      (shopNameMm != null && shopNameMm!.isNotEmpty) ? shopNameMm! : shopName;
 
   void saveReceiptFooter(String text) {
     receiptFooter = text.trim().isEmpty ? kDefaultReceiptFooter : text.trim();
