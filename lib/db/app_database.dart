@@ -16,7 +16,7 @@ class AppDatabase {
 
   final Database db;
 
-  static const int schemaVersion = 2;
+  static const int schemaVersion = 3;
 
   /// In-memory database with the full schema — used by unit tests so the
   /// repository layer can be exercised without platform channels.
@@ -128,6 +128,11 @@ class AppDatabase {
     '''CREATE TABLE IF NOT EXISTS credit_repayments (
       id TEXT PRIMARY KEY, customer_id TEXT NOT NULL,
       amount INTEGER NOT NULL DEFAULT 0, method TEXT, note TEXT, $_std)''',
+    // Schema v3: manual credit charges — debt-book entries the shop types
+    // in directly (goods taken now, pay later) without a POS sale.
+    '''CREATE TABLE IF NOT EXISTS credit_charges (
+      id TEXT PRIMARY KEY, customer_id TEXT NOT NULL,
+      amount INTEGER NOT NULL DEFAULT 0, note TEXT, $_std)''',
 
     // ---- Module tables (§1.3) — created now, used as categories unlock ----
     '''CREATE TABLE IF NOT EXISTS ktv_rooms (

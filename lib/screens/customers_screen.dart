@@ -75,7 +75,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
     final name = TextEditingController(text: existing?.name ?? '');
     final phone = TextEditingController(text: existing?.phone ?? '');
     final address = TextEditingController(text: existing?.address ?? '');
-    final saved = await showDialog<bool>(
+    final action = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(existing == null
@@ -132,9 +132,14 @@ class _CustomersScreenState extends State<CustomersScreen> {
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(state.t('cancel')),
           ),
+          if (existing != null)
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, 'charge'),
+              child: Text(state.t('add_credit')),
+            ),
           if (existing != null && existing.balanceDue > 0)
             TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
+              onPressed: () => Navigator.pop(dialogContext, 'repay'),
               child: Text(state.t('record_repayment')),
             ),
           FilledButton(
@@ -147,7 +152,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                 address:
                     address.text.trim().isEmpty ? null : address.text.trim(),
               ));
-              Navigator.pop(dialogContext, true);
+              Navigator.pop(dialogContext, 'save');
             },
             child: Text(state.t('save')),
           ),
@@ -155,11 +160,79 @@ class _CustomersScreenState extends State<CustomersScreen> {
       ),
     );
     if (!context.mounted) return;
-    if (saved == true) {
+    if (action == 'save') {
       setState(_reload);
-    } else if (saved == false && existing != null) {
-      // The dialog's repayment shortcut was chosen.
+    } else if (action == 'repay' && existing != null) {
       await _recordRepayment(context, existing);
+    } else if (action == 'charge' && existing != null) {
+      await _recordCharge(context, existing);
+    }
+  }
+
+  /// Manual debt-book entry: the customer took goods on credit outside a
+  /// POS sale, so the shop types the owed amount in directly.
+  Future<void> _recordCharge(BuildContext context, Customer c) async {
+    final state = context.read<AppState>();
+    final amount = TextEditingController();
+    final note = TextEditingController();
+    final done = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('${state.t('add_credit')} — ${c.name}'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: amount,
+                autofocus: true,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: state.t('amount'),
+                  helperText:
+                      '${state.t('balance_due')}: ${ks(c.balanceDue)}',
+                  border: const OutlineInputBorder(),
+                  isDense: true,
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: note,
+                decoration: InputDecoration(
+                  labelText: state.t('note_optional'),
+                  border: const OutlineInputBorder(),
+                  isDense: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(state.t('cancel')),
+          ),
+          FilledButton(
+            onPressed: () {
+              final v = int.tryParse(amount.text.trim());
+              if (v == null || v <= 0) return;
+              state.customers.recordCharge(
+                customerId: c.id,
+                amount: v,
+                note: note.text.trim().isEmpty ? null : note.text.trim(),
+              );
+              Navigator.pop(dialogContext, true);
+            },
+            child: Text(state.t('save')),
+          ),
+        ],
+      ),
+    );
+    if (done == true && context.mounted) {
+      setState(_reload);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(state.t('charge_done'))),
+      );
     }
   }
 

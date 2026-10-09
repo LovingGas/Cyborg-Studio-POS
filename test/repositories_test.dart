@@ -81,6 +81,23 @@ void main() {
     expect(list.single.balanceDue, -1000); // repayment stands, sale is gone
   });
 
+  test('manual credit charge raises balance, repayment lowers it', () {
+    final c = customers.save(Customer(id: newId(), name: 'Ma Lay'));
+
+    customers.recordCharge(customerId: c.id, amount: 5000, note: 'goods on credit');
+    var list = customers.listWithBalances();
+    expect(list.single.balanceDue, 5000);
+
+    customers.recordRepayment(customerId: c.id, amount: 2000, method: 'cash');
+    list = customers.listWithBalances();
+    expect(list.single.balanceDue, 3000);
+
+    expect(
+      creditBalance(creditSalesTotal: 1000, chargesTotal: 5000, repaymentsTotal: 2000),
+      4000,
+    );
+  });
+
   test('purchase increments stock and updates cost price', () {
     final p = seedProduct(stock: 5, cost: 1000);
     final supplier = purchases.addSupplier(name: 'Yangon Wholesale');

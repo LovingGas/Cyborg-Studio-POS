@@ -401,9 +401,14 @@ class SaleRepository {
 }
 
 /// The single definition of an outstanding credit balance:
-/// completed Credit-sale totals minus recorded repayments.
-int creditBalance({required int creditSalesTotal, required int repaymentsTotal}) =>
-    creditSalesTotal - repaymentsTotal;
+/// completed Credit-sale totals plus manual credit charges, minus
+/// recorded repayments.
+int creditBalance({
+  required int creditSalesTotal,
+  int chargesTotal = 0,
+  required int repaymentsTotal,
+}) =>
+    creditSalesTotal + chargesTotal - repaymentsTotal;
 
 class CustomerRepository {
   final AppDatabase _holder;
@@ -418,7 +423,9 @@ class CustomerRepository {
       'SELECT c.*, '
       '(SELECT COALESCE(SUM(s.total), 0) FROM sales s WHERE s.customer_id = c.id '
       "AND s.payment_method = 'credit' AND s.status = 'completed' "
-      'AND s.deleted_at IS NULL) - '
+      'AND s.deleted_at IS NULL) + '
+      '(SELECT COALESCE(SUM(ch.amount), 0) FROM credit_charges ch '
+      'WHERE ch.customer_id = c.id AND ch.deleted_at IS NULL) - '
       '(SELECT COALESCE(SUM(r.amount), 0) FROM credit_repayments r '
       'WHERE r.customer_id = c.id AND r.deleted_at IS NULL) AS computed_balance '
       'FROM customers c WHERE c.deleted_at IS NULL ORDER BY c.name COLLATE NOCASE',
@@ -463,6 +470,33 @@ class CustomerRepository {
       );
       _db.execute(
         'UPDATE customers SET balance_due = balance_due - ?, updated_at = ? WHERE id = ?',
+        [amount, t, customerId],
+      );
+      _db.execute('COMMIT');
+    } catch (_) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+  }
+
+  /// Records a manual credit charge (debt-book entry: goods taken now,
+  /// pay later, typed in without a POS sale) and raises the stored
+  /// `balance_due` column in step with the computed balance.
+  void recordCharge({
+    required String customerId,
+    required int amount,
+    String? note,
+  }) {
+    final t = nowMs();
+    _db.execute('BEGIN');
+    try {
+      _db.execute(
+        'INSERT INTO credit_charges (id, customer_id, amount, note, '
+        'shop_id, device_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [newId(), customerId, amount, note, identity.shopId, identity.deviceId, t, t],
+      );
+      _db.execute(
+        'UPDATE customers SET balance_due = balance_due + ?, updated_at = ? WHERE id = ?',
         [amount, t, customerId],
       );
       _db.execute('COMMIT');
