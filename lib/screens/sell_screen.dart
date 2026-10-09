@@ -19,10 +19,14 @@ class _SellScreenState extends State<SellScreen> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
-    final items = state.products
-        .list(categoryCode: pilotCategoryCode, query: _query, includeInactive: false)
-        .where((p) => !p.isOutOfStock)
-        .toList();
+    // Out-of-stock products stay visible (dimmed, not sellable) so a product
+    // added with 0 stock never looks "missing"; they sort after in-stock.
+    final listed = state.products.list(
+        categoryCode: pilotCategoryCode, query: _query, includeInactive: false);
+    final items = [
+      ...listed.where((p) => !p.isOutOfStock),
+      ...listed.where((p) => p.isOutOfStock),
+    ];
 
     return Column(
       children: [
@@ -56,8 +60,19 @@ class _SellScreenState extends State<SellScreen> {
                     final p = items[i];
                     return Card(
                       clipBehavior: Clip.antiAlias,
+                      color: p.isOutOfStock
+                          ? Theme.of(context).colorScheme.surfaceContainerHighest
+                          : null,
                       child: InkWell(
-                        onTap: () => state.addToCart(p),
+                        onTap: () {
+                          if (p.isOutOfStock) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(state.t('out_of_stock'))),
+                            );
+                            return;
+                          }
+                          state.addToCart(p);
+                        },
                         child: Padding(
                           padding: const EdgeInsets.all(10),
                           child: Column(
@@ -89,8 +104,20 @@ class _SellScreenState extends State<SellScreen> {
                                       color: Theme.of(context).colorScheme.primary,
                                       fontWeight: FontWeight.bold)),
                               Text(
-                                '${state.t('in_stock')}: ${_fmtQty(p.stockQty)} ${p.unit}',
-                                style: Theme.of(context).textTheme.bodySmall,
+                                p.isOutOfStock
+                                    ? state.t('out_of_stock')
+                                    : '${state.t('in_stock')}: ${_fmtQty(p.stockQty)} ${p.unit}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: p.isOutOfStock
+                                          ? Theme.of(context).colorScheme.error
+                                          : null,
+                                      fontWeight: p.isOutOfStock
+                                          ? FontWeight.bold
+                                          : null,
+                                    ),
                               ),
                             ],
                           ),
