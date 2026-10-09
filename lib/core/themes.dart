@@ -14,8 +14,9 @@ class AppThemeOption {
   String label(String lang) => lang == 'mm' ? labelMm : labelEn;
 }
 
-/// The 7 shop themes (same idea as the prototype's theme picker).
+/// The shop themes (same idea as the prototype's theme picker).
 const List<AppThemeOption> kAppThemes = [
+  AppThemeOption('red', Colors.red, 'Red', 'အနီ'),
   AppThemeOption('teal', Colors.teal, 'Teal', 'စိမ်းပြာ'),
   AppThemeOption('blue', Colors.blue, 'Blue', 'အပြာ'),
   AppThemeOption('indigo', Colors.indigo, 'Indigo', 'မဲနယ်'),
