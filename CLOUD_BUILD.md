@@ -1,4 +1,4 @@
-# Cloud APK Builds — All in One POS
+# Cloud APK Builds — Cyborg Studio POS
 
 The app is built in the cloud because the development VM cannot run Gradle
 (its network sandbox resets the Java build tool's own connections). The code

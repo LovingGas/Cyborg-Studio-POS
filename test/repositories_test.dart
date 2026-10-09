@@ -5,9 +5,9 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pos_app/db/app_database.dart';
-import 'package:pos_app/models/models.dart';
-import 'package:pos_app/repositories/repositories.dart';
+import 'package:cyborg_studio_pos/db/app_database.dart';
+import 'package:cyborg_studio_pos/models/models.dart';
+import 'package:cyborg_studio_pos/repositories/repositories.dart';
 import 'package:sqlite3/open.dart';
 
 void main() {

@@ -29,7 +29,7 @@ class AppDatabase {
 
   static Future<AppDatabase> open() async {
     final dir = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dir.path, 'all_in_one_pos.db'));
+    final file = File(p.join(dir.path, 'cyborg_studio_pos.db'));
     final db = sqlite3.open(file.path);
     db.execute('PRAGMA journal_mode = WAL');
     db.execute('PRAGMA foreign_keys = ON');

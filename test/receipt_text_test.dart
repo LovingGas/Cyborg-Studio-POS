@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pos_app/core/receipt_text.dart';
+import 'package:cyborg_studio_pos/core/receipt_text.dart';
 
 void main() {
   final items = [

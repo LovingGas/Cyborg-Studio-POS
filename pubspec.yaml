@@ -1,5 +1,5 @@
-name: pos_app
-description: "All in One POS — offline-first point of sale (Android first, Grocery pilot)."
+name: cyborg_studio_pos
+description: "Cyborg Studio POS — offline-first point of sale (Android first, Grocery pilot)."
 publish_to: 'none'
 version: 1.0.0+1
 

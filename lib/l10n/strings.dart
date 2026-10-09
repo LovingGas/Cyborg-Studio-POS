@@ -4,7 +4,7 @@ library;
 
 const Map<String, Map<String, String>> kStrings = {
   'en': {
-    'app_title': 'All in One POS',
+    'app_title': 'Cyborg Studio POS',
     'sell': 'Sell',
     'products': 'Products',
     'stock': 'Stock',
@@ -108,7 +108,7 @@ const Map<String, Map<String, String>> kStrings = {
     'receipt_footer': 'Receipt thank-you text',
   },
   'mm': {
-    'app_title': 'All in One POS',
+    'app_title': 'Cyborg Studio POS',
     'sell': 'အရောင်း',
     'products': 'ပစ္စည်းများ',
     'stock': 'လက်ကျန်',

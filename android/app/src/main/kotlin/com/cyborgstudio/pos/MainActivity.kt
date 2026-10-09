@@ -1,4 +1,4 @@
-package com.allinonepos.pos_app
+package com.cyborgstudio.pos
 
 import io.flutter.embedding.android.FlutterActivity
 

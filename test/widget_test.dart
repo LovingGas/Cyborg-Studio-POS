@@ -1,8 +1,8 @@
 // Lightweight sanity tests that need no platform channels (the full app
 // needs SQLite + path_provider, covered by on-device smoke testing).
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pos_app/core/constants.dart';
-import 'package:pos_app/l10n/strings.dart';
+import 'package:cyborg_studio_pos/core/constants.dart';
+import 'package:cyborg_studio_pos/l10n/strings.dart';
 
 void main() {
   test('21 categories with Grocery as pilot', () {
