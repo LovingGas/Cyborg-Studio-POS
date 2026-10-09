@@ -141,20 +141,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Text(state.t('theme_colour'),
             style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: [
-            for (final option in kAppThemes)
-              ChoiceChip(
-                label: Text(option.label(state.lang)),
-                avatar: CircleAvatar(
-                    backgroundColor: option.seed,
-                    radius: 9),
-                selected: state.themeKey == option.key,
-                onSelected: (_) => state.setTheme(option.key),
+        // Exactly 3 themes per row, however large the system font is.
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 1.35,
+          ),
+          itemCount: kAppThemes.length,
+          itemBuilder: (context, i) {
+            final option = kAppThemes[i];
+            final selected = state.themeKey == option.key;
+            return InkWell(
+              onTap: () => state.setTheme(option.key),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: selected
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).dividerColor,
+                    width: selected ? 2 : 1,
+                  ),
+                  color: selected
+                      ? Theme.of(context)
+                          .colorScheme
+                          .primaryContainer
+                          .withValues(alpha: 0.5)
+                      : null,
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(backgroundColor: option.seed, radius: 13),
+                    const SizedBox(height: 6),
+                    Text(
+                      option.label(state.lang),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: selected ? FontWeight.bold : null,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-          ],
+            );
+          },
         ),
         const Divider(height: 32),
         Text(state.t('license'),
