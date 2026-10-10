@@ -186,6 +186,7 @@ class SaleRecord {
 
 /// One line of a recorded sale (`sale_items`).
 class SaleItemRecord {
+  final String id;
   final String? productId;
   final String name;
   final double qty;
@@ -193,6 +194,7 @@ class SaleItemRecord {
   final int costPrice;
 
   const SaleItemRecord({
+    this.id = '',
     this.productId,
     required this.name,
     required this.qty,
@@ -203,6 +205,7 @@ class SaleItemRecord {
   int get amount => (qty * unitPrice).round();
 
   factory SaleItemRecord.fromRow(Row r) => SaleItemRecord(
+        id: (r['id'] as String?) ?? '',
         productId: r['product_id'] as String?,
         name: (r['product_name_snapshot'] as String?) ?? '',
         qty: (r['qty'] as num?)?.toDouble() ?? 0,

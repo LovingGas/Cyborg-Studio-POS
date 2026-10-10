@@ -198,6 +198,12 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
           ] else ...[
             const SizedBox(height: 16),
             OutlinedButton.icon(
+              icon: const Icon(Icons.edit_outlined),
+              label: Text(state.t('correct_prices')),
+              onPressed: () => _correctPrices(context, sale),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
               icon: const Icon(Icons.block, color: Colors.red),
               label: Text(state.t('void_sale'),
                   style: const TextStyle(color: Colors.red)),
@@ -244,5 +250,100 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(state.t('void_done'))),
     );
+  }
+
+  /// Fixes prices typed wrong on a sale that already went through:
+  /// per-item sell/cost prices are edited, and totals, profit and any
+  /// Credit balance are corrected to match. Quantities never change.
+  Future<void> _correctPrices(BuildContext context, SaleRecord sale) async {
+    final state = context.read<AppState>();
+    final items = state.sales.saleItems(sale.id);
+    final sellCtrls = [
+      for (final i in items) TextEditingController(text: i.unitPrice.toString())
+    ];
+    final costCtrls = [
+      for (final i in items) TextEditingController(text: i.costPrice.toString())
+    ];
+    final done = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(state.t('correct_prices')),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var idx = 0; idx < items.length; idx++) ...[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '${items[idx].name} × ${_fmtQty(items[idx].qty)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: sellCtrls[idx],
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: state.t('sell_price'),
+                          border: const OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: costCtrls[idx],
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: state.t('cost_price'),
+                          border: const OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+              ],
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(state.t('cancel')),
+          ),
+          FilledButton(
+            onPressed: () {
+              state.sales.correctSalePrices(sale.id, [
+                for (var idx = 0; idx < items.length; idx++)
+                  (
+                    itemId: items[idx].id,
+                    unitPrice:
+                        int.tryParse(sellCtrls[idx].text.trim()) ??
+                            items[idx].unitPrice,
+                    costPrice:
+                        int.tryParse(costCtrls[idx].text.trim()) ??
+                            items[idx].costPrice,
+                  ),
+              ]);
+              Navigator.pop(dialogContext, true);
+            },
+            child: Text(state.t('save')),
+          ),
+        ],
+      ),
+    );
+    if (done == true && context.mounted) {
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(state.t('sale_corrected'))),
+      );
+    }
   }
 }

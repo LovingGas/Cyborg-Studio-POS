@@ -98,6 +98,33 @@ void main() {
     );
   });
 
+  test('correcting a sale price fixes totals, profit and credit balance', () {
+    // Sold at the wrong price: 200 instead of 2,000 (cost 100).
+    final p = seedProduct(stock: 10, cost: 100, sell: 200);
+    final c = customers.save(Customer(id: newId(), name: 'Mg Mg'));
+    final sale = sales.completeSale(
+      items: [CartItem(p, 2)],
+      paymentMethod: 'credit',
+      customerId: c.id,
+    );
+    expect(sale.total, 400);
+    expect(customers.listWithBalances().single.balanceDue, 400);
+
+    final item = sales.saleItems(sale.id).single;
+    sales.correctSalePrices(sale.id, [
+      (itemId: item.id, unitPrice: 2000, costPrice: 100),
+    ]);
+
+    final fixed = sales.saleById(sale.id)!;
+    expect(fixed.total, 4000);
+    expect(fixed.costTotal, 200);
+    expect(fixed.profit, 3800);
+    expect(fixed.amountPaid, 4000); // non-cash tracks the total
+    expect(customers.listWithBalances().single.balanceDue, 4000);
+    // Stock is untouched by a price correction.
+    expect(products.list().single.stockQty, 8);
+  });
+
   test('purchase increments stock and updates cost price', () {
     final p = seedProduct(stock: 5, cost: 1000);
     final supplier = purchases.addSupplier(name: 'Yangon Wholesale');

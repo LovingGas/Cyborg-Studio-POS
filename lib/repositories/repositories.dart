@@ -331,6 +331,57 @@ class SaleRepository {
     }
   }
 
+  /// Corrects the recorded prices of a completed sale (the product's
+  /// price was typed wrong and the sale already went through). Quantities
+  /// and stock do not change; totals, the stored cost total and — for
+  /// Credit sales — the customer's balance are brought back in line, so
+  /// dashboard profit tells the truth again. No-op for void sales.
+  void correctSalePrices(
+    String saleId,
+    List<({String itemId, int unitPrice, int costPrice})> lines,
+  ) {
+    final sale = saleById(saleId);
+    if (sale == null || sale.isVoid) return;
+    final t = nowMs();
+    _db.execute('BEGIN');
+    try {
+      for (final l in lines) {
+        _db.execute(
+          'UPDATE sale_items SET unit_price = ?, cost_price_snapshot = ?, '
+          "updated_at = ?, sync_status = 'pending' WHERE id = ? AND sale_id = ?",
+          [l.unitPrice, l.costPrice, t, l.itemId, saleId],
+        );
+      }
+      final items = saleItems(saleId);
+      final newTotal =
+          items.fold<int>(0, (s, i) => s + (i.qty * i.unitPrice).round());
+      final newCost =
+          items.fold<int>(0, (s, i) => s + (i.qty * i.costPrice).round());
+      // Cash keeps the amount actually handed over (change re-derives);
+      // every other method was settled at the total, so it tracks it.
+      final isCash = sale.paymentMethod == 'cash';
+      final newPaid = isCash ? sale.amountPaid : newTotal;
+      final newChange =
+          isCash && newPaid > newTotal ? newPaid - newTotal : 0;
+      _db.execute(
+        'UPDATE sales SET total = ?, cost_total = ?, amount_paid = ?, '
+        "change_due = ?, updated_at = ?, sync_status = 'pending' WHERE id = ?",
+        [newTotal, newCost, newPaid, newChange, t, saleId],
+      );
+      if (sale.paymentMethod == 'credit' && sale.customerId != null) {
+        _db.execute(
+          'UPDATE customers SET balance_due = balance_due + ?, updated_at = ? '
+          'WHERE id = ?',
+          [newTotal - sale.total, t, sale.customerId],
+        );
+      }
+      _db.execute('COMMIT');
+    } catch (_) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+  }
+
   // ---- Dashboard aggregates (completed sales only) ----
 
   static int _startOfDayMs(DateTime d) =>
