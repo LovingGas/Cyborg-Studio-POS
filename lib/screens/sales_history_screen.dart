@@ -175,7 +175,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
             // view hid the left/right ends at large system font sizes).
             child: FittedBox(
               fit: BoxFit.scaleDown,
-              alignment: Alignment.topLeft,
+              alignment: Alignment.topCenter,
               child: Text(
                 text,
                 softWrap: false,
