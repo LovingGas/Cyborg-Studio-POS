@@ -140,21 +140,26 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Row(
+          Text(state.t('paper_width')),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
             children: [
-              Text(state.t('paper_width')),
-              const Spacer(),
-              SegmentedButton<int>(
-                segments: const [
-                  ButtonSegment(value: kPaper58Chars, label: Text('58mm')),
-                  ButtonSegment(value: kPaper80Chars, label: Text('80mm')),
-                ],
-                selected: {_widthChars},
-                onSelectionChanged: (s) {
-                  setState(() => _widthChars = s.first);
-                  state.setPaperWidthChars(s.first);
-                },
-              ),
+              for (final (chars, label) in const [
+                (kPaper40Chars, '40mm'),
+                (kPaper48Chars, '48mm'),
+                (kPaper58Chars, '58mm'),
+                (kPaper80Chars, '80mm'),
+              ])
+                ChoiceChip(
+                  label: Text(label),
+                  selected: _widthChars == chars,
+                  onSelected: (_) {
+                    setState(() => _widthChars = chars);
+                    state.setPaperWidthChars(chars);
+                  },
+                ),
             ],
           ),
           const SizedBox(height: 12),

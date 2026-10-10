@@ -106,7 +106,7 @@ class _SellScreenState extends State<SellScreen> {
                               Text(
                                 p.isOutOfStock
                                     ? state.t('out_of_stock')
-                                    : '${state.t('in_stock')}: ${_fmtQty(p.stockQty)} ${p.unit}',
+                                    : '${state.t('in_stock')}: ${_fmtQty(p.stockQty)} ${unitLabel(p.unit, state.lang)}',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall

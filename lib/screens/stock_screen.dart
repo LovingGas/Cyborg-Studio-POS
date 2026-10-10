@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../core/constants.dart';
 import '../main.dart';
 import '../models/models.dart';
 import '../state/app_state.dart';
@@ -84,7 +85,7 @@ class StockScreen extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            '${_fmtQty(p.stockQty)} ${p.unit}',
+                            '${_fmtQty(p.stockQty)} ${unitLabel(p.unit, state.lang)}',
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 15),
                           ),

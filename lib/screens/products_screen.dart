@@ -52,7 +52,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         subtitle: Text(
                           '${categoryByCode(p.categoryCode).nameEn} · '
                           '${ks(p.sellPrice)} · ${state.t('in_stock')}: '
-                          '${_fmtQty(p.stockQty)} ${p.unit}'
+                          '${_fmtQty(p.stockQty)} ${unitLabel(p.unit, state.lang)}'
                           '${p.isLowStock ? ' · ${state.t('low_stock')}' : ''}',
                         ),
                         trailing: p.isFavorite
@@ -260,7 +260,8 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                       InputDecoration(labelText: state.t('unit'), isDense: true),
                   items: [
                     for (final u in kUnits)
-                      DropdownMenuItem(value: u, child: Text(u)),
+                      DropdownMenuItem(
+                          value: u, child: Text(unitLabel(u, state.lang))),
                   ],
                   onChanged: (v) => setState(() => _unit = v ?? _unit),
                 ),

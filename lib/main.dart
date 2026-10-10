@@ -39,8 +39,13 @@ class PosApp extends StatelessWidget {
       title: 'Cyborg Studio POS',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme:
-            ColorScheme.fromSeed(seedColor: themeSeedColor(state.themeKey)),
+        // Fidelity keeps the applied colours close to the chosen seed —
+        // the default tonal variant washed red/maroon/yellow out into
+        // look-alike pastels.
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: themeSeedColor(state.themeKey),
+          dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
+        ),
         useMaterial3: true,
       ),
       home: const Shell(),

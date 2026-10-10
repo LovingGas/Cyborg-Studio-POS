@@ -100,20 +100,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
               border: const OutlineInputBorder()),
         ),
         const SizedBox(height: 10),
-        Row(
+        Text(state.t('paper_width')),
+        const SizedBox(height: 6),
+        // Chips wrap instead of a segmented row — four segments overflowed
+        // off-screen at large system font sizes.
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
           children: [
-            Text(state.t('paper_width')),
-            const Spacer(),
-            SegmentedButton<int>(
-              segments: const [
-                ButtonSegment(value: kPaper40Chars, label: Text('40mm')),
-                ButtonSegment(value: kPaper48Chars, label: Text('48mm')),
-                ButtonSegment(value: kPaper58Chars, label: Text('58mm')),
-                ButtonSegment(value: kPaper80Chars, label: Text('80mm')),
-              ],
-              selected: {state.paperWidthChars},
-              onSelectionChanged: (s) => state.setPaperWidthChars(s.first),
-            ),
+            for (final (chars, label) in const [
+              (kPaper40Chars, '40mm'),
+              (kPaper48Chars, '48mm'),
+              (kPaper58Chars, '58mm'),
+              (kPaper80Chars, '80mm'),
+            ])
+              ChoiceChip(
+                label: Text(label),
+                selected: state.paperWidthChars == chars,
+                onSelected: (_) => state.setPaperWidthChars(chars),
+              ),
           ],
         ),
         const SizedBox(height: 12),

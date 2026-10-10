@@ -18,7 +18,7 @@ class AppThemeOption {
 const List<AppThemeOption> kAppThemes = [
   AppThemeOption('maroon', Color(0xFF800000), 'Maroon', 'နီညို'),
   AppThemeOption('red', Colors.red, 'Red', 'အနီ'),
-  AppThemeOption('yellow', Colors.yellow, 'Yellow', 'အဝါ'),
+  AppThemeOption('yellow', Colors.amber, 'Yellow', 'အဝါ'),
   AppThemeOption('teal', Colors.teal, 'Teal', 'စိမ်းပြာ'),
   AppThemeOption('blue', Colors.blue, 'Blue', 'အပြာ'),
   AppThemeOption('indigo', Colors.indigo, 'Indigo', 'မဲနယ်'),

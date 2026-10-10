@@ -151,7 +151,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 size: 20,
               ),
               title: Text(p.displayName(state.lang)),
-              trailing: Text('${_fmtQty(p.stockQty)} ${p.unit}'),
+              trailing:
+                  Text('${_fmtQty(p.stockQty)} ${unitLabel(p.unit, state.lang)}'),
             ),
         const Divider(height: 24),
         Text('${state.t('expiring_soon')} (${expiring.length})',

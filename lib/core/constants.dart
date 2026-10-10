@@ -49,6 +49,35 @@ const List<String> kUnits = [
   'person', 'trip', 'ticket', 'day', 'service',
 ];
 
+/// Display labels for unit codes. The stored value stays the code; the UI
+/// localizes it (Myanmar mode must not show raw English unit words).
+const Map<String, ({String en, String mm})> kUnitLabels = {
+  'pcs': (en: 'pcs', mm: 'ခု'),
+  'kg': (en: 'kg', mm: 'ကီလို'),
+  'pack': (en: 'pack', mm: 'ထုပ်'),
+  'bag': (en: 'bag', mm: 'အိတ်'),
+  'bottle': (en: 'bottle', mm: 'ပုလင်း'),
+  'box': (en: 'box', mm: 'ဘူး'),
+  'can': (en: 'can', mm: 'သံဘူး'),
+  'night': (en: 'night', mm: 'ည'),
+  'sheet': (en: 'sheet', mm: 'ချပ်'),
+  'gallon': (en: 'gallon', mm: 'ဂါလံ'),
+  'length': (en: 'length', mm: 'ပေ'),
+  'tical': (en: 'tical', mm: 'ကျပ်သား'),
+  'gram': (en: 'gram', mm: 'ဂရမ်'),
+  'person': (en: 'person', mm: 'ယောက်'),
+  'trip': (en: 'trip', mm: 'ခရီး'),
+  'ticket': (en: 'ticket', mm: 'စောင်'),
+  'day': (en: 'day', mm: 'ရက်'),
+  'service': (en: 'service', mm: 'ဝန်ဆောင်မှု'),
+};
+
+String unitLabel(String code, String lang) {
+  final l = kUnitLabels[code];
+  if (l == null) return code;
+  return lang == 'mm' ? l.mm : l.en;
+}
+
 class PaymentMethod {
   final String code;
   final String label;
