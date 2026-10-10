@@ -26,6 +26,8 @@ const List<AppThemeOption> kAppThemes = [
   AppThemeOption('pink', Colors.pink, 'Pink', 'ပန်းရောင်'),
   AppThemeOption('orange', Colors.orange, 'Orange', 'လိမ္မော်'),
   AppThemeOption('green', Colors.green, 'Green', 'အစိမ်း'),
+  AppThemeOption(
+      'neon_cyan', Color(0xFF00E5FF), 'Neon Cyan', 'နီယွန် စိမ်းပြာ'),
 ];
 
 const String kDefaultThemeKey = 'teal';
